@@ -82,8 +82,4 @@ router
     else next();
   });
 
-// GET /api/posts?userId=<VALUE>
-// Retrieves all posts by a user with the specified postId.
-router.route('');
-
 module.exports = router;
