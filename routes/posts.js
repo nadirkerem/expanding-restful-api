@@ -1,21 +1,26 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 
-const posts = require("../data/posts");
-const error = require("../utilities/error");
+const posts = require('../data/posts');
+const error = require('../utilities/error');
 
 router
-  .route("/")
+  .route('/')
   .get((req, res) => {
-    const links = [
-      {
-        href: "posts/:id",
-        rel: ":id",
-        type: "GET",
-      },
-    ];
+    if (req.query.userId) {
+      const userPosts = posts.filter((post) => post.userId == req.query.userId);
+      res.json({ posts: userPosts });
+    } else {
+      const links = [
+        {
+          href: 'posts/:id',
+          rel: ':id',
+          type: 'GET',
+        },
+      ];
 
-    res.json({ posts, links });
+      res.json({ posts, links });
+    }
   })
   .post((req, res, next) => {
     if (req.body.userId && req.body.title && req.body.content) {
@@ -28,24 +33,24 @@ router
 
       posts.push(post);
       res.json(posts[posts.length - 1]);
-    } else next(error(400, "Insufficient Data"));
+    } else next(error(400, 'Insufficient Data'));
   });
 
 router
-  .route("/:id")
+  .route('/:id')
   .get((req, res, next) => {
     const post = posts.find((p) => p.id == req.params.id);
 
     const links = [
       {
         href: `/${req.params.id}`,
-        rel: "",
-        type: "PATCH",
+        rel: '',
+        type: 'PATCH',
       },
       {
         href: `/${req.params.id}`,
-        rel: "",
-        type: "DELETE",
+        rel: '',
+        type: 'DELETE',
       },
     ];
 
@@ -76,5 +81,9 @@ router
     if (post) res.json(post);
     else next();
   });
+
+// GET /api/posts?userId=<VALUE>
+// Retrieves all posts by a user with the specified postId.
+router.route('');
 
 module.exports = router;

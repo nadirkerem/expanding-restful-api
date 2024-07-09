@@ -1,17 +1,18 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 
-const users = require("../data/users");
-const error = require("../utilities/error");
+const users = require('../data/users');
+const posts = require('../data/posts');
+const error = require('../utilities/error');
 
 router
-  .route("/")
+  .route('/')
   .get((req, res) => {
     const links = [
       {
-        href: "users/:id",
-        rel: ":id",
-        type: "GET",
+        href: 'users/:id',
+        rel: ':id',
+        type: 'GET',
       },
     ];
 
@@ -20,7 +21,7 @@ router
   .post((req, res, next) => {
     if (req.body.name && req.body.username && req.body.email) {
       if (users.find((u) => u.username == req.body.username)) {
-        next(error(409, "Username Already Taken"));
+        next(error(409, 'Username Already Taken'));
       }
 
       const user = {
@@ -32,24 +33,24 @@ router
 
       users.push(user);
       res.json(users[users.length - 1]);
-    } else next(error(400, "Insufficient Data"));
+    } else next(error(400, 'Insufficient Data'));
   });
 
 router
-  .route("/:id")
+  .route('/:id')
   .get((req, res, next) => {
     const user = users.find((u) => u.id == req.params.id);
 
     const links = [
       {
         href: `/${req.params.id}`,
-        rel: "",
-        type: "PATCH",
+        rel: '',
+        type: 'PATCH',
       },
       {
         href: `/${req.params.id}`,
-        rel: "",
-        type: "DELETE",
+        rel: '',
+        type: 'DELETE',
       },
     ];
 
@@ -80,5 +81,16 @@ router
     if (user) res.json(user);
     else next();
   });
+
+// GET /api/users/:id/posts
+// Retrieves all posts by a user with the specified id.
+router.route('/:id/posts').get((req, res, next) => {
+  const user = users.find((u) => u.id == req.params.id);
+
+  const userPosts = posts.filter((post) => post.userId === user.id);
+
+  if (user) res.json({ userPosts });
+  else next();
+});
 
 module.exports = router;
