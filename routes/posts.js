@@ -82,4 +82,21 @@ router
     else next();
   });
 
+router.route('/:id/comments').get((req, res, next) => {
+  if (req.query.userId) {
+    const userComments = comments.filter(
+      (comment) => comment.userId == req.query.userId
+    );
+    res.json({ comments: userComments });
+  } else {
+    const postComments = comments.filter(
+      (comment) => comment.postId == req.params.id
+    );
+    if (postComments.length === 0) {
+      return next(error(404, 'No Comments Found'));
+    }
+    res.json({ comments: postComments });
+  }
+});
+
 module.exports = router;

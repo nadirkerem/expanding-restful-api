@@ -93,4 +93,21 @@ router.route('/:id/posts').get((req, res, next) => {
   else next();
 });
 
+router.route('/:id/comments').get((req, res, next) => {
+  if (req.query.userId) {
+    const userComments = comments.filter(
+      (comment) => comment.userId == req.query.userId
+    );
+    res.json({ comments: userComments });
+  } else {
+    const userComments = comments.filter(
+      (comment) => comment.postId == req.params.id
+    );
+    if (userComments.length === 0) {
+      return next(error(404, 'Comments not found'));
+    }
+    res.json({ comments: userComments });
+  }
+});
+
 module.exports = router;
